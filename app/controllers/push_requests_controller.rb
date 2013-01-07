@@ -6,34 +6,25 @@ class PushRequestsController < ApplicationController
     file_md5_hash = params[:file_md5_hash]
 
     unless auth_code && current_uuid && file_url && file_md5_hash
-      @message = view_context.error_message_to_json('Missing Parameters')
-      render :json => @message
-      return
+      render_error('Missing Parameters') && return
     end
 
     # authenticate site
     site = Site.authenticate(auth_code)
-
     unless site
-      @message = view_context.error_message_to_json('Invalid auth_code')
-      render :json => @message
-      return
+      render_error('Invalid auth_code') && return
     end
 
     # make sure that the site and the registry have the same UUID for this site 
     # TODO: if this check fails, then this node is out of sync. we need to figure out a procedure to fix this!
     unless (site.current_uuid == current_uuid)
-      @message = view_context.error_message_to_json('Invalid current_uuid')
-      render :json => @message
-      return
+      render_error('Invalid current_uuid') && return
     end
 
     # check if the registry is processing another request.
     # in the future we may remove this check if needed.
     if PushRequest.registry_is_busy?
-      @message = view_context.error_message_to_json('Registry is busy')
-      render :json => @message
-      return
+      render_error('Registry is busy') && return
     end
 
     push_request = PushRequest.new
@@ -50,23 +41,27 @@ class PushRequestsController < ApplicationController
 
   def query
     uuid = params[:uuid]
-
-    unless uuid      
-      @message = view_context.error_message_to_json('Missing uuid')
-      render :json => @message
-      return
+    unless uuid
+      render_error('Missing uuid') && return
     end
 
     push_request = PushRequest.find_by_uuid(uuid)
-
     unless push_request
       # invalid uuid
-      @message = view_context.error_message_to_json('Invalid uuid')
-      render :json => @message
-      return
+      render_error('Invalid uuid') && return
     end
 
     # render object
     render :json => view_context.send_status_to_node(push_request)
   end
+
+  private
+
+  def render_error(error_message)
+    json_hash = {
+      :success => 0,
+      :message => error_message }
+    render :json => json_hash.to_json, :status => 400
+  end
+
 end

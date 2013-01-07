@@ -1,12 +1,4 @@
 module ApplicationHelper
-  def error_message_to_json(message)
-    arr = {}
-    arr[:success] = 0
-    arr[:message] = message
-
-    arr.to_json
-  end
-
   def send_processing_to_node(uuid, received_at)
     arr = {}
     arr[:success] = ''

@@ -5,116 +5,112 @@ require 'digest/md5'
 
 
 module EOL
-	class PushesProcessor
-		def self.process_pushes
-			requests = PushRequest.where('success is null')
-			unless requests
-				puts "Nothing to process"				
-			else					
-				# Now start processing pushes
-				puts "Processing pushes"
-				requests.each do |request|
-					process_push(request)
-				end
-			end
-		end
+  class PushesProcessor
+    def self.process_pushes
+      push_requests = PushRequest.where('success is null')
+      unless push_requests
+        puts "Nothing to process"
+      else
+        # Now start processing pushes
+        puts "Processing pushes"
+        push_requests.each do |push_request|
+          process_push(push_request)
+        end
+      end
+    end
     
-		def self.process_push(request)
-			file_url = Rails.root.join("log", "sync_logs", "#{request.id}")
+    def self.process_push(push_request)
+      file_url = Rails.root.join("log", "sync_logs", "#{push_request.id}")
 
-			# download the log file, render :nothing => true if no success
-			unless download_file?(request.file_url, "#{file_url}.json")
-				report_failure(request, "Error downloading file: #{request.file_url}")
-				render :nothing => true
-			end
+      # download the log file, render :nothing => true if no success
+      unless download_file?(push_request.file_url, "#{file_url}.json")
+        report_failure(push_request, "Error downloading file: #{push_request.file_url}")
+        render :nothing => true
+      end
 
-			# download the md5 file, render :nothing => true if no success
-			unless download_file?(request.file_md5_hash, "#{file_url}.md5")
-				report_failure(request, "Error downloading file: #{request.file_md5_hash}")
-				render :nothing => true
-			end
+      # download the md5 file, render :nothing => true if no success
+      unless download_file?(push_request.file_md5_hash, "#{file_url}.md5")
+        report_failure(push_request, "Error downloading file: #{push_request.file_md5_hash}")
+        render :nothing => true
+      end
 
-			# validate the md5 checksum
-			unless validate_md5?("#{file_url}.json", "#{file_url}.md5")
-				report_failure(request, "Invalid md5 checksum")
-				render :nothing => true
-			end 
+      # validate the md5 checksum
+      unless validate_md5?("#{file_url}.json", "#{file_url}.md5")
+        report_failure(push_request, "Invalid md5 checksum")
+        render :nothing => true
+      end
 
-			# Now, all checks are done. 
-			# start importing data
-			import_data(request)
+      # Now, all checks are done.
+      # start importing data
+      import_data(push_request)
 
-			# report success
-			report_success(request)
-		end
+      # report success
+      report_success(push_request)
+    end
 
-		def self.report_failure(request, message)
-			request.success = 0
-			request.failed_at = DateTime.now
-			request.failed_reason = message
-			request.save
-		end
+    def self.report_failure(push_request, message)
+      push_request.success = 0
+      push_request.failed_at = DateTime.now
+      push_request.failed_reason = message
+      push_request.save
+    end
 
-		def self.report_success(request)
-			request.success = 1
-			request.success_at = DateTime.now
-			request.save
-		end
+    def self.report_success(push_request)
+      push_request.success = 1
+      push_request.success_at = DateTime.now
+      push_request.save
+    end
 
-		def self.download_file?(file_url, file_name)
-			begin
-				url = URI.parse(file_url)
-		  	resp=Net::HTTP.get_response(url)
-		  	open(file_name, 'wb') do |file|
-		  		file.write resp.body
-		  	end
-		  	return true
-		  rescue
-		  	return false
-		  end
-		end		
+    def self.download_file?(file_url, file_name)
+      begin
+        url = URI.parse(file_url)
+        resp = Net::HTTP.get_response(url)
+        open(file_name, 'wb') do |file|
+          file.write resp.body
+        end
+        return true
+      rescue
+        return false
+      end
+    end
 
-		def self.validate_md5?(file_url, mdf_file)
-			data = File.read(file_url)
-			md5_checksum = Digest::MD5.hexdigest(data)
-			if (md5_checksum == File.read(mdf_file))
-				return true
-			else
-				return false
-			end
-		end
+    def self.validate_md5?(file_url, mdf_file)
+      data = File.read(file_url)
+      md5_checksum = Digest::MD5.hexdigest(data)
+      if (md5_checksum == File.read(mdf_file))
+        return true
+      else
+        return false
+      end
+    end
 
-		def self.import_data(request)
-			file_url = Rails.root.join("log", "sync_logs", "#{request.id}.json")
-			data = File.read(file_url)			
-			data_json = JSON.parse(data)
-			
-			
+    def self.import_data(push_request)
+      file_url = Rails.root.join("log", "sync_logs", "#{push_request.id}.json")
+      data = File.read(file_url)
+      data_json = JSON.parse(data)
 
-			data_json.each do |data_element|
-				peer_log = PeerLog.new
-				peer_log.push_request_id = request.id
-				peer_log.user_site_id = data_element["user_site_id"]
-				peer_log.user_site_object_id = data_element["user_site_object_id"]
-				peer_log.action_taken_at_time = data_element["action_taken_at_time"]
-				peer_log.sync_object_action_id = data_element["sync_object_action_id"]
-				peer_log.sync_object_type_id = data_element["sync_object_type_id"]
-				peer_log.sync_object_id = data_element["sync_object_id"]
-				peer_log.sync_object_site_id = data_element["sync_object_site_id"]
+      data_json.each do |data_element|
+        peer_log = PeerLog.new
+        peer_log.push_request_id = push_request.id
+        peer_log.user_site_id = data_element["user_site_id"]
+        peer_log.user_site_object_id = data_element["user_site_object_id"]
+        peer_log.action_taken_at_time = data_element["action_taken_at_time"]
+        peer_log.sync_object_action_id = data_element["sync_object_action_id"]
+        peer_log.sync_object_type_id = data_element["sync_object_type_id"]
+        peer_log.sync_object_id = data_element["sync_object_id"]
+        peer_log.sync_object_site_id = data_element["sync_object_site_id"]
+        peer_log.save
 
-				peer_log.save
-
-				data_element["parameters"].each do |param|
-					lap = LogActionParameter.new
-					lap.peer_log_id = peer_log.id
-					lap.param_object_id = param["param_object_id"]
-					lap.param_object_site_id = param["param_object_site_id"]
-					lap.parameter = param["parameter"]
-					lap.value = param["value"]
-
-					lap.save					
-				end
-			end
-		end
-	end
+        data_element["parameters"].each do |param|
+          lap = LogActionParameter.new
+          lap.peer_log_id = peer_log.id
+          lap.param_object_id = param["param_object_id"]
+          lap.param_object_site_id = param["param_object_site_id"]
+          lap.parameter = param["parameter"]
+          lap.value = param["value"]
+          lap.save
+        end
+      end
+    end
+  end
 end
