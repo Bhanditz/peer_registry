@@ -1,8 +1,14 @@
 EolRegistryRails::Application.routes.draw do
-  get "pull_requests/pull"
-
-  get "push_requests/make_push"
-
-  get "push_requests/query"
+  resource :push_requests do
+    collection do
+      get 'make_push'
+      get 'query'
+    end
+  end
   
+  resource :pull_requests do
+    collection do
+      get 'pull'
+    end
+  end
 end

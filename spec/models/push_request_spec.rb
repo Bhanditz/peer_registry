@@ -7,7 +7,7 @@ describe PushRequest do
   end
 
   it 'should generate uuid' do
-    PushRequest.gen().uuid.should_not be_nil
+    PushRequest.gen().uuid.should match(/[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/)
   end
 
 end
