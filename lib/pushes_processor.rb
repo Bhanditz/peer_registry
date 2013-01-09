@@ -43,7 +43,10 @@ module EOL
 			# Now, all checks are done. 
 			# start importing data
 			import_data(request)
-
+      
+      # update site uuid
+      update_site_with_uuid(request.site_id, request.uuid)  
+      
 			# report success
 			report_success(request)
 		end
@@ -55,10 +58,16 @@ module EOL
 			request.save
 		end
 
-		def self.report_success(request)
+		def self.report_success(request)					
 			request.success = 1
 			request.success_at = DateTime.now
 			request.save
+		end
+		
+		def update_site_with_uuid(site_id, uuid)
+		  site = Site.find_by_id(site_id)
+		  site.current_uuid = uuid
+		  site.save
 		end
 
 		def self.download_file?(file_url, file_name)

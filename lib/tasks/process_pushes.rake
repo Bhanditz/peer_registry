@@ -11,4 +11,17 @@ namespace :sync do
 			sleep(10)
 		end
 	end
+	
+	desc 'Create an empty push as a start'
+	task :create_empty_push => :environment do
+	  pr = PushRequest.new
+	  pr.success = 1
+	  pr.save
+	  
+	  sites = Site.all
+	  sites.each do |site|
+	    site.current_uuid = pr.uuid
+	    site.save
+	  end
+	end
 end

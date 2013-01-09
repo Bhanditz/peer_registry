@@ -11,8 +11,8 @@ module ApplicationHelper
     arr = {}
     arr[:success] = ''
     arr[:message] = 'processing'
-    arr['uuid'] = uuid
-    arr['received_at'] = received_at
+    arr[:uuid] = uuid
+    arr[:received_at] = received_at
 
     arr.to_json
   end
