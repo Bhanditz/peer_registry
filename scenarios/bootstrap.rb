@@ -10,6 +10,7 @@ SyncObjectType.gen(:object_type => "DataObject")
 SyncObjectType.gen(:object_type => "Member")
 SyncObjectType.gen(:object_type => "Resource")
 SyncObjectType.gen(:object_type => "User")
+SyncObjectType.gen(:object_type => "Language")
 
 SyncObjectAction.gen(:object_action => "create")
 SyncObjectAction.gen(:object_action => "update")

@@ -9,6 +9,7 @@ EolRegistryRails::Application.routes.draw do
   resource :pull_requests do
     collection do
       get 'pull'
+      get 'report'
     end
   end
 end

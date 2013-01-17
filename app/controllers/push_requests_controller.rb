@@ -53,15 +53,29 @@ class PushRequestsController < ApplicationController
 
     # render object
     render :json => view_context.send_status_to_node(push_request)
-  end
-
+  end 
+  
   private
-
+  
   def render_error(error_message)
     json_hash = {
       :success => 0,
       :message => error_message }
     render :json => json_hash.to_json, :status => 400
+  end
+  
+  def any_pulls_for_site(site, uuid)
+    # Get push for this uuid
+    push_request = PushRequest.find_by_uuid(uuid)
+        
+    # get the uuid the node should have after the pull is success
+    uuid_to_be = PushRequest.get_uuid_to_be(push_request, current_uuid, site.id)
+    
+    if (uuid_to_be == uuid)
+      return false
+    else
+      return true
+    end
   end
 
 end

@@ -18,6 +18,4 @@ module ApplicationHelper
 
     arr.to_json
   end
-
-
 end
