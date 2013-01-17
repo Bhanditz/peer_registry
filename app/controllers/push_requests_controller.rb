@@ -26,6 +26,10 @@ class PushRequestsController < ApplicationController
     if PushRequest.registry_is_busy?
       render_error('Registry is busy') && return
     end
+    
+    if any_pulls_for_site(site, current_uuid)
+      render_error('Pull First') && return
+    end
 
     push_request = PushRequest.new
     push_request.site_id = site.id
@@ -69,7 +73,7 @@ class PushRequestsController < ApplicationController
     push_request = PushRequest.find_by_uuid(uuid)
         
     # get the uuid the node should have after the pull is success
-    uuid_to_be = PushRequest.get_uuid_to_be(push_request, current_uuid, site.id)
+    uuid_to_be = PushRequest.get_uuid_to_be(push_request, uuid, site.id)
     
     if (uuid_to_be == uuid)
       return false
