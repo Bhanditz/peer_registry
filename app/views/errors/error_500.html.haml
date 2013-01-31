@@ -1,0 +1,16 @@
+%h2 500
+%div
+  %h3 We're sorry
+  %p
+    An error occurred:
+    %strong= exception.message
+  %p
+    Want to
+    %a{href: "/"} go back to our home page
+    and try again?
+  %hr
+  %p
+    Backtrace:
+    %ul
+      - exception.backtrace.each do |line|
+        %li= line

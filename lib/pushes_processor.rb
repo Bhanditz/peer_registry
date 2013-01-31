@@ -18,7 +18,7 @@ module EOL
         end
       end
     end
-    
+
     def self.process_push(request)
       file_url = Rails.root.join("log", "sync_logs", "#{request.id}")
 
@@ -38,15 +38,15 @@ module EOL
       unless validate_md5?("#{file_url}.json", "#{file_url}.md5")
         report_failure(request, "Invalid md5 checksum")
         return
-      end 
+      end
 
-      # Now, all checks are done. 
+      # Now, all checks are done.
       # start importing data
       import_data(request)
-      
+
       # update site uuid
-      update_site_with_uuid(request.site_id, request.uuid)  
-      
+      update_site_with_uuid(request.site_id, request.uuid)
+
       # report success
       report_success(request)
     end
@@ -58,12 +58,12 @@ module EOL
       request.save
     end
 
-    def self.report_success(request)          
+    def self.report_success(request)
       request.success = 1
       request.success_at = DateTime.now
       request.save
     end
-    
+
     def self.update_site_with_uuid(site_id, uuid)
       site = Site.find_by_id(site_id)
       site.current_uuid = uuid
@@ -95,7 +95,7 @@ module EOL
 
     def self.import_data(request)
       file_url = Rails.root.join("log", "sync_logs", "#{request.id}.json")
-      data = File.read(file_url)      
+      data = File.read(file_url)
       data_json = JSON.parse(data)
 
       data_json.each do |data_element|
@@ -119,7 +119,7 @@ module EOL
           lap.parameter = param["parameter"]
           lap.value = param["value"]
 
-          lap.save          
+          lap.save
         end
       end
     end

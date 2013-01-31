@@ -11,7 +11,7 @@ describe PushRequestsController do
       get 'make_push'
       response.should_not be_success
       response_data = JSON.parse(response.body)
-      response_data['message'].should == 'Missing Parameters'
+      response_data['message'].should == 'Missing auth_code'
     end
 
     it "returns http failure when the auth_code is invalid" do
@@ -28,13 +28,13 @@ describe PushRequestsController do
       response_data['message'].should == 'Invalid current_uuid'
     end
 
+    # TODO: this should probably fail - we should validate the availability of the files
     it "returns http success even though file urls aren't right" do
       get 'make_push', :auth_code => @site.auth_code, :current_uuid => @site.current_uuid, :file_url => 'junk', :file_md5_hash => 'junk'
       response.should be_success
       response_data = JSON.parse(response.body)
       response_data['message'].should == 'processing'
     end
-
   end
 
   describe "GET 'query'" do
@@ -61,5 +61,4 @@ describe PushRequestsController do
       response_data['success_at'].should == p.success_at.iso8601.to_s
     end
   end
-
 end

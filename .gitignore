@@ -13,7 +13,8 @@
 # Ignore all logfiles and tempfiles.
 /log/*.log
 /tmp
-/log/sync_logs
+/log/sync_logs/*
+/public/files/*
 
 *.stackdump
 *.exe

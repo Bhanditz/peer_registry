@@ -47,6 +47,8 @@ ActiveRecord::Schema.define(:version => 20121227130326) do
     t.integer  "success"
     t.string   "file_url"
     t.string   "file_md5_hash"
+    t.datetime "failed_at"
+    t.string   "failed_reason"
   end
 
   create_table "push_requests", :force => true do |t|

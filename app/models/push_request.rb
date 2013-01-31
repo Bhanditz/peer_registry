@@ -6,30 +6,18 @@ class PushRequest < ActiveRecord::Base
 
   before_create :generate_uuid
 
-  def self.registry_is_busy?
-    self.where("success is null").count > 0
+  def self.pending
+    self.where('success is null')
   end
-  
-  def self.get_uuid_to_be(push_request, uuid, site_id)    
-    # get the latest uuid that the node should have when the pull is success
-    pr = PushRequest.find(:first, 
-                          :select => 'uuid',
-                          :conditions => ["received_at > ? and site_id <> ? and success=1", push_request.received_at, site_id],
-                          :order => "received_at DESC")
 
-    if pr
-      pr.uuid
-    else
-      push_request.uuid
-    end
-     
-    
+  def self.latest_successful_push
+    PushRequest.where('success = 1').order('id DESC').first rescue nil
   end
-  
+
   private
 
-    def generate_uuid
-      self.uuid = UUIDTools::UUID.timestamp_create().to_s unless self.uuid?
-    end
+  def generate_uuid
+    self.uuid = UUIDTools::UUID.timestamp_create().to_s unless self.uuid?
+  end
 
 end
