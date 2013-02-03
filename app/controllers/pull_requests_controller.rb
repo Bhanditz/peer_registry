@@ -58,7 +58,7 @@ class PullRequestsController < ApplicationController
     pull_event = PullEvent.find_by_site_id_and_state_uuid(@site.id, uuid)
     raise JSONException.new('Invalid Pull') unless pull_event
     # the pull had already succeeded or failed
-    raise JSONException.new('Pull has already been completed') if pull_event.success_at || success_at.failed_at
+    raise JSONException.new('Pull has already been completed') if pull_event.success
 
     if success.to_i > 0
       pull_event.success = 1

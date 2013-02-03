@@ -37,6 +37,4 @@ describe PushRequest do
     visit "/push_requests/make_push?auth_code=#{site.auth_code}&current_uuid=#{uuid}&file_url=http://www.example.com/test.json&file_md5_hash=http://www.example.com/test.json"    
     body.should include('"message":"processing"')
   end
-
-
 end
