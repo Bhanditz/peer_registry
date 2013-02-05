@@ -53,7 +53,7 @@ describe PullRequestsController do
     end
 
     # TODO: I don't really think many of these should generate failures - we need
-    # a standard way to generate a JSON reponse for a successful, but uneventful request
+    # a standard way to generate a JSON response for a successful, but uneventful request
     it "returns http failure when the site is at the latest push event" do
       push = PushRequest.gen(:site => @site)
       @site.update_column('current_uuid', push.uuid)
