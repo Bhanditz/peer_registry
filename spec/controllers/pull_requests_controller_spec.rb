@@ -68,7 +68,7 @@ describe PullRequestsController do
       @site.update_column('current_uuid', push.uuid)
 
       other_site = Site.gen
-      other_site_push = PushRequest.gen(:site => other_site)
+      other_site_push = PushRequest.gen(:site => other_site, :success => 1)
       other_site.update_column('current_uuid', other_site_push.uuid)
       peer_log1 = PeerLog.gen(:push_request => other_site_push)
       peer_log2 = PeerLog.gen(:push_request => other_site_push)

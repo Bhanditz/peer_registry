@@ -7,7 +7,7 @@ class PushRequest < ActiveRecord::Base
   before_create :generate_uuid
 
   def self.pending
-    self.where('success is null')
+    PushRequest.where('success is null')
   end
 
   def self.latest_successful_push

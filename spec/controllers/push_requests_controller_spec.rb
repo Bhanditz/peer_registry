@@ -52,8 +52,8 @@ describe PushRequestsController do
       response_data['message'].should == 'Invalid uuid'
     end
 
-    it "returns http failure when invalid uuid is provided" do
-      p = PushRequest.gen
+    it "returns successfull push" do
+      p = PushRequest.gen(:success => 1)
       get 'query', :uuid => p.uuid
       response.should be_success
       response_data = JSON.parse(response.body)

@@ -33,7 +33,7 @@ FactoryGirl.define do
     file_md5_hash       { Digest::MD5.hexdigest(generate(:string)) }
     received_at         { Time.now }
     success_at          { Time.now }
-    success             true
+    success             nil
   end
 
   factory :site do
