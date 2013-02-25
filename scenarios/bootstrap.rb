@@ -22,9 +22,9 @@ SyncObjectAction.gen(:object_action => "hide")
 
 
 # Creating MBL's site
-mbl = Site.gen(:name => 'MBL', :url => 'http://localhost:3001/')
+mbl = Site.gen(:id => 1, :name => 'MBL', :url => 'http://localhost:3001/')
 PullEvent.gen(:site => mbl)
-mbl_push = PushRequest.gen(:site => mbl)
+mbl_push = PushRequest.gen(:site => mbl, :success => 1)
 # Pushing that User 12345 was created at MBL yesterday
 mbl_user_log = PeerLog.gen(:push_request => mbl_push, :user_site => mbl, :user_site_object_id => 12345,
   :sync_object_type => SyncObjectType.find_by_object_type('User'),
@@ -45,10 +45,10 @@ mbl.save
 
 
 # Creating BA's site
-ba = Site.gen(:name => 'BA', :url => 'http://localhost:3002/')
+ba = Site.gen(:id => 2, :name => 'BA', :url => 'http://localhost:3002/')
 # BA pulls MBL's latest changes
 PullEvent.gen(:site => ba, :state_uuid => mbl_push.uuid)
-ba_push = PushRequest.gen(:site => ba)
+ba_push = PushRequest.gen(:site => ba, :success => 1)
 # Pushing that User 67890 was created at BA six hours ago
 ba_user_log = PeerLog.gen(:push_request => ba_push, :user_site => ba, :user_site_object_id => 67890,
   :sync_object_type => SyncObjectType.find_by_object_type('User'),
