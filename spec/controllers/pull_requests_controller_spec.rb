@@ -38,7 +38,7 @@ describe PullRequestsController do
 
     it "returns http failure when there are no push events in the system" do
       get 'pull', :auth_code => @site.auth_code, :current_uuid => @site.current_uuid
-      response.should_not be_success
+      response.code.should == "208"
       response_data = JSON.parse(response.body)
       response_data['message'].should == 'Nothing to pull'
     end
@@ -47,7 +47,7 @@ describe PullRequestsController do
       push = PushRequest.gen(:site => @site)
       @site.update_column('current_uuid', push.uuid)
       get 'pull', :auth_code => @site.auth_code, :current_uuid => push.uuid
-      response.should_not be_success
+      response.code.should == "208"
       response_data = JSON.parse(response.body)
       response_data['message'].should == 'Nothing to pull'
     end
@@ -58,7 +58,7 @@ describe PullRequestsController do
       push = PushRequest.gen(:site => @site)
       @site.update_column('current_uuid', push.uuid)
       get 'pull', :auth_code => @site.auth_code, :current_uuid => push.uuid
-      response.should_not be_success
+      response.code.should == "208"
       response_data = JSON.parse(response.body)
       response_data['message'].should == 'Nothing to pull'
     end

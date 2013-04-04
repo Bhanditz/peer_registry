@@ -6,11 +6,11 @@ class PullRequestsController < ApplicationController
 
   def pull
     # Check if there is any pending pull for this site
-    raise JSONException.new('Another pull is in progress') if @site.unprocessed_pulls.count > 0
+    return render_error(405, 'Another pull is in progress') if @site.unprocessed_pulls.count > 0
 
     latest_successful_push = PushRequest.latest_successful_push
-    raise JSONException.new('Nothing to pull') if latest_successful_push.nil?  # there haven't been any pushes
-    raise JSONException.new('Nothing to pull') if @site.current_uuid == latest_successful_push.uuid  # already up-to-date
+    return render_error(208, 'Nothing to pull') if latest_successful_push.nil?  # there haven't been any pushes
+    return render_error(208, 'Nothing to pull') if @site.current_uuid == latest_successful_push.uuid  # already up-to-date
 
     peer_logs = PeerLog.new_logs_for_site(@site) # Get Peer Logs for pending pushes
     combined_logs = PeerLog.combine_logs_in_one_json(peer_logs) # Convert the logs to json format
@@ -52,13 +52,13 @@ class PullRequestsController < ApplicationController
     uuid = params[:uuid]
     success = params[:success]
     reason = params[:reason]
-    raise JSONException.new('Missing parameters') if uuid.blank? || success.blank?
+    return render_error(400, 'Missing parameters') if uuid.blank? || success.blank?
 
     # get the Pull
     pull_event = PullEvent.find_by_site_id_and_state_uuid(@site.id, uuid)
-    raise JSONException.new('Invalid Pull') unless pull_event
+    return render_error(406, 'Invalid Pull') unless pull_event
     # the pull had already succeeded or failed
-    raise JSONException.new('Pull has already been completed') if pull_event.success
+    return render_error(406, 'Pull has already been completed') if pull_event.success
 
     if success.to_i > 0
       pull_event.success = 1

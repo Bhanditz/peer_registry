@@ -8,11 +8,11 @@ class PushRequestsController < ApplicationController
     file_url = params[:file_url]
     file_md5_hash = params[:file_md5_hash]
 
-    raise JSONException.new('Missing parameters') if file_url.blank? || file_md5_hash.blank?
+    return render_error(400, 'Missing parameters') if file_url.blank? || file_md5_hash.blank?
     # check if the registry is processing another request.
     # in the future we may remove this check if needed.
-    raise JSONException.new('Registry is busy') unless PushRequest.pending.empty?
-    raise JSONException.new('Pull first') unless @site.up_to_date?
+    return render_error(405, 'Registry is busy') unless PushRequest.pending.empty?
+    return render_error(409, 'Pull first') unless @site.up_to_date?
 
     push_request = PushRequest.new
     push_request.site_id = @site.id
@@ -26,10 +26,10 @@ class PushRequestsController < ApplicationController
   end
 
   def query
-    raise JSONException.new('Missing uuid') if params[:uuid].blank?
+    return render_error(400, 'Missing uuid') if params[:uuid].blank?
 
     push_request = PushRequest.find_by_uuid(params[:uuid])
-    raise JSONException.new('Invalid uuid') unless push_request
+    return render_error(401, 'Invalid uuid') unless push_request
 
     render :json => view_context.send_status_to_node(push_request)
   end

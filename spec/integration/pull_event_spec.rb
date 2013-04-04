@@ -22,7 +22,7 @@ describe PullEvent do
   
   it 'should reject pull and report Nothing to pull' do
     visit "/pull_requests/pull?auth_code=#{@site.auth_code}&current_uuid=#{@site.current_uuid}"
-    body.should include('"message":"Nothing to pull"')    
+    body.should include('Nothing to pull')
   end
   
   it 'should accept pull and send UUID' do
