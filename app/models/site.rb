@@ -12,7 +12,7 @@ class Site < ActiveRecord::Base
   end
 
   def unprocessed_pulls
-    pull_events.where('success_at IS NULL')
+    pull_events.where('success is NULL')
   end
 
   def up_to_date?

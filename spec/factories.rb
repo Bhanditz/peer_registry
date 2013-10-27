@@ -23,6 +23,7 @@ FactoryGirl.define do
   factory :pull_event do
     association         :site
     pull_at             { Time.now }
+    success             nil
     success_at          { Time.now }
     state_uuid          { UUIDTools::UUID.timestamp_create().to_s }
   end
